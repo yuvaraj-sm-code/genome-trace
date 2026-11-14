@@ -43,7 +43,7 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[var(--color-bg-base)] text-slate-100 flex flex-col">
+    <div className="relative min-h-screen bg-[var(--color-bg-base)] text-slate-800 dark:text-slate-100 flex flex-col transition-colors duration-200">
       {/* Dynamic Background Reactive to Mutation Changes */}
       <AmbientGlow />
 
@@ -99,3 +99,4 @@ export function App() {
 }
 
 export default App;
+

@@ -418,3 +418,4 @@ export const SequenceStatisticsPage: React.FC = () => {
     </div>
   );
 };
+

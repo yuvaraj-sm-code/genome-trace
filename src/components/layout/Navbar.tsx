@@ -11,7 +11,9 @@ import {
   AlertTriangle,
   Info,
   Palette,
-  ExternalLink
+  ExternalLink,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useGenome, NavTab } from '../../context/GenomeContext';
 
@@ -68,6 +70,8 @@ export const Navbar: React.FC = () => {
     setSearchQuery,
     currentAnalysis,
     setHelpModalOpen,
+    themeMode,
+    toggleThemeMode,
     addToast
   } = useGenome();
 
@@ -225,6 +229,30 @@ export const Navbar: React.FC = () => {
             )}
           </div>
 
+          {/* Theme Mode Toggle (Dark / Light Mode) */}
+          <button
+            onClick={toggleThemeMode}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all duration-200 select-none cursor-pointer ${
+              themeMode === 'dark'
+                ? 'bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800 hover:border-slate-700 shadow-sm'
+                : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 shadow-sm'
+            }`}
+            title={themeMode === 'dark' ? 'Switch to Light Mode (White & Clean Background)' : 'Switch to Dark Mode (Lab Slate)'}
+            aria-label="Toggle theme between dark and light mode"
+          >
+            {themeMode === 'dark' ? (
+              <>
+                <Sun className="w-4 h-4 text-amber-400" />
+                <span className="hidden sm:inline text-xs font-semibold">Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-4 h-4 text-indigo-600" />
+                <span className="hidden sm:inline text-xs font-semibold">Dark</span>
+              </>
+            )}
+          </button>
+
           {/* Help Button (Opens Bioinformatics Guide Modal) */}
           <button
             onClick={() => setHelpModalOpen(true)}
@@ -238,3 +266,4 @@ export const Navbar: React.FC = () => {
     </header>
   );
 };
+

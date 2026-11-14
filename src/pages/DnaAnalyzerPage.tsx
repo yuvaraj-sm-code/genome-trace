@@ -505,3 +505,4 @@ export const DnaAnalyzerPage: React.FC = () => {
     </div>
   );
 };
+

@@ -15,7 +15,9 @@ import {
   X,
   User,
   ShieldCheck,
-  BookOpen
+  BookOpen,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useGenome, NavTab } from '../../context/GenomeContext';
 
@@ -35,7 +37,9 @@ export const Sidebar: React.FC = () => {
     mobileMenuOpen,
     setMobileMenuOpen,
     currentAnalysis,
-    setHelpModalOpen
+    setHelpModalOpen,
+    themeMode,
+    toggleThemeMode
   } = useGenome();
 
   const mutationCount = currentAnalysis?.result?.mutations.length || 0;
@@ -217,8 +221,26 @@ export const Sidebar: React.FC = () => {
           )}
         </div>
 
+        {/* Quick Theme Mode Toggle */}
+        <button
+          onClick={toggleThemeMode}
+          className="mt-2 p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl transition-all text-xs flex items-center gap-2 w-full justify-center border border-transparent hover:border-slate-800"
+          title={themeMode === 'dark' ? 'Switch to Light Mode (Clinical White)' : 'Switch to Dark Mode (Lab Slate)'}
+        >
+          {themeMode === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-indigo-500" />
+          )}
+          {!sidebarCollapsed && (
+            <span className="text-[11px] font-medium text-slate-400">
+              {themeMode === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </span>
+          )}
+        </button>
+
         {/* Sidebar Collapse Toggle Button (Desktop only) */}
-        <div className="hidden md:flex justify-end mt-2 pt-2 border-t border-slate-800/40">
+        <div className="hidden md:flex justify-end mt-1 pt-2 border-t border-slate-800/40">
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-lg transition-colors text-xs flex items-center gap-1.5 w-full justify-center"

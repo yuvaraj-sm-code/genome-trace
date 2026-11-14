@@ -26,6 +26,8 @@ export const SettingsPage: React.FC = () => {
     currentTheme,
     setThemeById,
     updateThemeColors,
+    themeMode,
+    setThemeMode,
     addToast,
     clearInputs,
     loadDemo
@@ -332,6 +334,44 @@ export const SettingsPage: React.FC = () => {
           </div>
 
           <div className="space-y-3 text-xs">
+            {/* Color Mode Switcher */}
+            <div>
+              <span className="font-semibold text-slate-200 block mb-2">Display Theme Mode</span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setThemeMode('dark')}
+                  className={`p-3 rounded-xl border flex items-center gap-2.5 transition-all text-left ${
+                    themeMode === 'dark'
+                      ? 'border-cyan-500 bg-slate-950 text-white shadow-md'
+                      : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Moon className="w-4 h-4 text-cyan-400" />
+                  <div>
+                    <div className="font-bold text-xs">Dark Mode</div>
+                    <div className="text-[10px] text-slate-500">Deep Lab Slate</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setThemeMode('light')}
+                  className={`p-3 rounded-xl border flex items-center gap-2.5 transition-all text-left ${
+                    themeMode === 'light'
+                      ? 'border-cyan-500 bg-white text-slate-900 shadow-md'
+                      : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Sun className="w-4 h-4 text-amber-500" />
+                  <div>
+                    <div className="font-bold text-xs">Light Mode</div>
+                    <div className="text-[10px] text-slate-500">Clinical White Lab</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             <label className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 cursor-pointer">
               <div>
                 <div className="font-semibold text-slate-200">Show Codon Reading Frame</div>
@@ -427,3 +467,4 @@ export const SettingsPage: React.FC = () => {
     </div>
   );
 };
+

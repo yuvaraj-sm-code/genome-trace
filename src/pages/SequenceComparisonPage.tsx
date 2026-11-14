@@ -429,3 +429,4 @@ export const SequenceComparisonPage: React.FC = () => {
     </div>
   );
 };
+

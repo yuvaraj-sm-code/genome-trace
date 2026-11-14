@@ -127,6 +127,9 @@ interface GenomeContextType {
   currentTheme: CustomThemePalette;
   setThemeById: (id: string) => void;
   updateThemeColors: (updates: Partial<CustomThemePalette>) => void;
+  themeMode: 'dark' | 'light';
+  setThemeMode: (mode: 'dark' | 'light') => void;
+  toggleThemeMode: () => void;
   toasts: ToastMessage[];
   addToast: (type: ToastMessage['type'], title: string, message: string) => void;
   removeToast: (id: string) => void;
@@ -172,7 +175,50 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Theme & Dynamic Ambiance
   const [currentTheme, setCurrentTheme] = useState<CustomThemePalette>(PRESET_THEMES[0]);
+  const [themeMode, setThemeModeState] = useState<'dark' | 'light'>(() => {
+    try {
+      const saved = localStorage.getItem('genome_trace_theme_mode');
+      return saved === 'light' || saved === 'dark' ? saved : 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Apply themeMode to document root element
+  useEffect(() => {
+    const root = document.documentElement;
+    if (themeMode === 'light') {
+      root.classList.remove('dark');
+      root.classList.add('light');
+      root.setAttribute('data-theme-mode', 'light');
+    } else {
+      root.classList.remove('light');
+      root.classList.add('dark');
+      root.setAttribute('data-theme-mode', 'dark');
+    }
+  }, [themeMode]);
+
+  const setThemeMode = (mode: 'dark' | 'light') => {
+    setThemeModeState(mode);
+    try {
+      localStorage.setItem('genome_trace_theme_mode', mode);
+    } catch {
+      // ignore
+    }
+  };
+
+  const toggleThemeMode = () => {
+    const next = themeMode === 'dark' ? 'light' : 'dark';
+    setThemeMode(next);
+    addToast(
+      'info',
+      'Display Mode Switched',
+      next === 'light'
+        ? 'Switched to Light Mode (Clinical White Laboratory).'
+        : 'Switched to Dark Mode (Deep Bioinformatic Slate).'
+    );
+  };
 
   // Initialize initial analysis and sample history
   useEffect(() => {
@@ -476,6 +522,9 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         currentTheme,
         setThemeById,
         updateThemeColors,
+        themeMode,
+        setThemeMode,
+        toggleThemeMode,
         toasts,
         addToast,
         removeToast,
@@ -506,3 +555,4 @@ export function useGenome(): GenomeContextType {
   }
   return context;
 }
+

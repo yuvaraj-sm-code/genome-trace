@@ -200,3 +200,4 @@ export const AnalysisHistoryPage: React.FC = () => {
     </div>
   );
 };
+
