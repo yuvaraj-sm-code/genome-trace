@@ -306,46 +306,60 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
 
-  // Update dynamic CSS variables whenever currentTheme or currentAnalysis mutational profile changes
+  // Update dynamic CSS variables whenever currentTheme, themeMode or currentAnalysis mutational profile changes
   useEffect(() => {
     const root = document.documentElement;
 
-    root.style.setProperty('--color-bg-base', currentTheme.bgBase);
-    root.style.setProperty('--color-bg-surface', currentTheme.bgSurface);
-    root.style.setProperty('--color-primary', currentTheme.primary);
-    root.style.setProperty('--color-mutation-sub', currentTheme.mutationSub);
-    root.style.setProperty('--color-mutation-ins', currentTheme.mutationIns);
-    root.style.setProperty('--color-mutation-del', currentTheme.mutationDel);
-    root.style.setProperty('--color-mutation-match', currentTheme.mutationMatch);
+    if (themeMode === 'light') {
+      root.style.setProperty('--color-bg-base', '#f0f4f9');
+      root.style.setProperty('--color-bg-surface', '#ffffff');
+      root.style.setProperty('--color-bg-surface-elevated', '#f8fafc');
+      root.style.setProperty('--color-bg-surface-hover', '#e8eef5');
+      root.style.setProperty('--color-border', '#e2e8f0');
+      root.style.setProperty('--color-primary', currentTheme.primary || '#0284c7');
+      root.style.setProperty('--color-mutation-sub', currentTheme.mutationSub || '#f59e0b');
+      root.style.setProperty('--color-mutation-ins', currentTheme.mutationIns || '#10b981');
+      root.style.setProperty('--color-mutation-del', currentTheme.mutationDel || '#f43f5e');
+      root.style.setProperty('--color-mutation-match', currentTheme.mutationMatch || '#0284c7');
 
-    // Dynamic Reactive Background Glow based on mutation composition
-    if (currentAnalysis && currentAnalysis.result) {
-      const { substitutions, insertions, deletions, matches, totalPositions } = currentAnalysis.result;
-      const totalMutations = substitutions + insertions + deletions;
+      // Vibrant and colorful light ambiance
+      root.style.setProperty('--dynamic-ambient-glow-1', 'rgba(14, 165, 233, 0.16)');
+      root.style.setProperty('--dynamic-ambient-glow-2', 'rgba(245, 158, 11, 0.14)');
+      root.style.setProperty('--dynamic-ambient-glow-3', 'rgba(244, 63, 94, 0.14)');
+    } else {
+      root.style.setProperty('--color-bg-base', currentTheme.bgBase);
+      root.style.setProperty('--color-bg-surface', currentTheme.bgSurface);
+      root.style.setProperty('--color-primary', currentTheme.primary);
+      root.style.setProperty('--color-mutation-sub', currentTheme.mutationSub);
+      root.style.setProperty('--color-mutation-ins', currentTheme.mutationIns);
+      root.style.setProperty('--color-mutation-del', currentTheme.mutationDel);
+      root.style.setProperty('--color-mutation-match', currentTheme.mutationMatch);
 
-      if (totalMutations === 0) {
-        // High identity cyan aura
-        root.style.setProperty('--dynamic-ambient-glow-1', 'rgba(14, 165, 233, 0.12)');
-        root.style.setProperty('--dynamic-ambient-glow-2', 'rgba(6, 182, 212, 0.08)');
-        root.style.setProperty('--dynamic-ambient-glow-3', 'rgba(16, 185, 129, 0.05)');
-      } else {
-        const subRatio = substitutions / totalMutations;
-        const insRatio = insertions / totalMutations;
-        const delRatio = deletions / totalMutations;
+      // Dynamic Reactive Background Glow based on mutation composition
+      if (currentAnalysis && currentAnalysis.result) {
+        const { substitutions, insertions, deletions, matches, totalPositions } = currentAnalysis.result;
+        const totalMutations = substitutions + insertions + deletions;
 
-        // Warm amber / coral for substitutions
-        const glow1 = `rgba(245, 158, 11, ${Math.max(0.04, Math.min(0.24, subRatio * 0.22))})`;
-        // Emerald / green for insertions
-        const glow2 = `rgba(16, 185, 129, ${Math.max(0.04, Math.min(0.24, insRatio * 0.22))})`;
-        // Rose / red for deletions
-        const glow3 = `rgba(244, 63, 94, ${Math.max(0.04, Math.min(0.24, delRatio * 0.22))})`;
+        if (totalMutations === 0) {
+          root.style.setProperty('--dynamic-ambient-glow-1', 'rgba(14, 165, 233, 0.12)');
+          root.style.setProperty('--dynamic-ambient-glow-2', 'rgba(6, 182, 212, 0.08)');
+          root.style.setProperty('--dynamic-ambient-glow-3', 'rgba(16, 185, 129, 0.05)');
+        } else {
+          const subRatio = substitutions / totalMutations;
+          const insRatio = insertions / totalMutations;
+          const delRatio = deletions / totalMutations;
 
-        root.style.setProperty('--dynamic-ambient-glow-1', glow1);
-        root.style.setProperty('--dynamic-ambient-glow-2', glow2);
-        root.style.setProperty('--dynamic-ambient-glow-3', glow3);
+          const glow1 = `rgba(245, 158, 11, ${Math.max(0.04, Math.min(0.24, subRatio * 0.22))})`;
+          const glow2 = `rgba(16, 185, 129, ${Math.max(0.04, Math.min(0.24, insRatio * 0.22))})`;
+          const glow3 = `rgba(244, 63, 94, ${Math.max(0.04, Math.min(0.24, delRatio * 0.22))})`;
+
+          root.style.setProperty('--dynamic-ambient-glow-1', glow1);
+          root.style.setProperty('--dynamic-ambient-glow-2', glow2);
+          root.style.setProperty('--dynamic-ambient-glow-3', glow3);
+        }
       }
     }
-  }, [currentTheme, currentAnalysis]);
+  }, [currentTheme, themeMode, currentAnalysis]);
 
   const addToast = (type: ToastMessage['type'], title: string, message: string) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
