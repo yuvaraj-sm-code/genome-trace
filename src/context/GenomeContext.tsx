@@ -11,6 +11,14 @@ import {
   DEMO_DATASETS,
   parseFasta
 } from '../utils/bioinformatics';
+import {
+  isSupabaseConfigured,
+  getSupabaseConfig,
+  setSupabaseConfig,
+  saveAnalysisToSupabase,
+  fetchAnalysesFromSupabase,
+  deleteAnalysisFromSupabase
+} from '../utils/supabase';
 
 export type NavTab =
   | 'dashboard'
@@ -130,6 +138,10 @@ interface GenomeContextType {
   themeMode: 'dark' | 'light';
   setThemeMode: (mode: 'dark' | 'light') => void;
   toggleThemeMode: () => void;
+  isSupabaseConnected: boolean;
+  supabaseConfig: { url: string; anonKey: string };
+  updateSupabaseCredentials: (url: string, anonKey: string) => Promise<boolean>;
+  syncWithSupabase: () => Promise<void>;
   toasts: ToastMessage[];
   addToast: (type: ToastMessage['type'], title: string, message: string) => void;
   removeToast: (id: string) => void;
@@ -184,6 +196,53 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   });
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // Supabase Database state
+  const [supabaseConfigState, setSupabaseConfigState] = useState(() => getSupabaseConfig());
+  const [isSupabaseConnected, setIsSupabaseConnected] = useState(() => isSupabaseConfigured());
+
+  const syncWithSupabase = async () => {
+    if (!isSupabaseConfigured()) return;
+    try {
+      const res = await fetchAnalysesFromSupabase();
+      if (res.success && res.data && res.data.length > 0) {
+        setHistory((prev) => {
+          const merged = [...res.data!, ...prev.filter((p) => !res.data!.some((d) => d.id === p.id))];
+          return merged;
+        });
+        setIsSupabaseConnected(true);
+        addToast('success', 'Supabase Synced', `Loaded ${res.data.length} records from database.`);
+      } else if (res.error) {
+        console.warn('Supabase fetch error:', res.error);
+      }
+    } catch (err) {
+      console.warn('Supabase sync error:', err);
+    }
+  };
+
+  const updateSupabaseCredentials = async (url: string, anonKey: string): Promise<boolean> => {
+    setSupabaseConfig(url, anonKey);
+    setSupabaseConfigState({ url, anonKey });
+    const configured = Boolean(url.trim() && anonKey.trim());
+    setIsSupabaseConnected(configured);
+
+    if (configured) {
+      const res = await fetchAnalysesFromSupabase();
+      if (res.success) {
+        if (res.data && res.data.length > 0) {
+          setHistory(res.data);
+        }
+        addToast('success', 'Supabase Connected', 'Database connection established successfully.');
+        return true;
+      } else {
+        addToast('warning', 'Supabase Configured', `Connected, note: ${res.error || 'Ensure table exists'}`);
+        return false;
+      }
+    } else {
+      addToast('info', 'Database Mode', 'Switched to local session storage.');
+      return true;
+    }
+  };
 
   // Apply themeMode to document root element
   useEffect(() => {
@@ -303,6 +362,19 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setHistory([initialRecord, brca1Record, sarsRecord, crisprRecord]);
     if (initialRecord.result.mutations.length > 0) {
       setSelectedMutation(initialRecord.result.mutations[0]);
+    }
+
+    // If Supabase is configured, fetch persisted cloud analyses
+    if (isSupabaseConfigured()) {
+      fetchAnalysesFromSupabase().then((res) => {
+        if (res.success && res.data && res.data.length > 0) {
+          setHistory((prev) => {
+            const merged = [...res.data!, ...prev.filter((p) => !res.data!.some((d) => d.id === p.id))];
+            return merged;
+          });
+          setIsSupabaseConnected(true);
+        }
+      });
     }
   }, []);
 
@@ -471,6 +543,17 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setSelectedMutation(null);
           }
 
+          // Asynchronously sync to Supabase database if connected
+          if (isSupabaseConfigured()) {
+            saveAnalysisToSupabase(newRecord).then((dbRes) => {
+              if (dbRes.success) {
+                addToast('success', 'Database Synced', `Analysis ${newRecord.id} saved to Supabase.`);
+              } else {
+                console.warn('Supabase auto-save note:', dbRes.error);
+              }
+            });
+          }
+
           setIsAnalyzing(false);
           addToast(
             'success',
@@ -506,6 +589,9 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const deleteAnalysis = (id: string) => {
     setHistory((prev) => prev.filter((h) => h.id !== id));
+    if (isSupabaseConfigured()) {
+      deleteAnalysisFromSupabase(id);
+    }
     addToast('warning', 'Analysis Removed', `Record ${id} removed from session history.`);
   };
 
@@ -539,6 +625,10 @@ export const GenomeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         themeMode,
         setThemeMode,
         toggleThemeMode,
+        isSupabaseConnected,
+        supabaseConfig: supabaseConfigState,
+        updateSupabaseCredentials,
+        syncWithSupabase,
         toasts,
         addToast,
         removeToast,

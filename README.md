@@ -24,7 +24,7 @@ Genome Trace is a bioinformatics web platform designed for biotechnology researc
 - **Prominent "ANALYZE DNA" CTA**: Interactive alignment execution with pulse effects and compute states.
 
 ### 3. **Structured Sequence Comparison**
-- **Dynamic Pairwise Alignment Matrix**: Needleman-Wunsch dynamic programming with affine gap penalties.
+- **Dynamic Pairwise Alignment Matrix**: Pairwise dynamic programming with affine gap penalties.
 - **Three-Row Homology Visualizer**:
   - Row 1: Reference sequence (5' → 3') with nucleotide coordinates.
   - Row 2: Homology connector track showing match indicators (`|`), substitutions (`•`), insertions (`+`), and deletions (`×`).

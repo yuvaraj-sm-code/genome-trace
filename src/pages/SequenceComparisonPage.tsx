@@ -217,7 +217,7 @@ export const SequenceComparisonPage: React.FC = () => {
           <span className="text-xl sm:text-2xl font-heading font-bold text-emerald-300 font-mono">
             {identityPercentage}%
           </span>
-          <span className="text-[10px] text-slate-500 block mt-0.5">Needleman-Wunsch</span>
+          <span className="text-[10px] text-slate-500 block mt-0.5">Homology Matrix</span>
         </div>
 
         <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 shadow-md text-center col-span-2 sm:col-span-1">
@@ -263,8 +263,13 @@ export const SequenceComparisonPage: React.FC = () => {
       {/* STRUCTURED ALIGNMENT VIEW (Reference Row, Connector/Match Row, Sample Row, Position Track) */}
       <div
         ref={sequenceContainerRef}
-        className="rounded-2xl bg-slate-900/90 border border-slate-800/90 shadow-xl overflow-hidden"
+        className="rounded-2xl bg-slate-900/90 border border-slate-800/90 shadow-xl overflow-hidden relative"
       >
+        {/* Animated Laser Scanning Beam */}
+        <div className="relative h-[2px] w-full overflow-hidden bg-slate-800/40">
+          <div className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-laser-scan" />
+        </div>
+
         <div className="p-4 bg-slate-950/80 border-b border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-cyan-400" />

@@ -172,7 +172,7 @@ export function classifySubstitution(ref: string, sample: string): string {
 }
 
 /**
- * Needleman-Wunsch Global Alignment Algorithm
+ * Dynamic Programming Pairwise Global Alignment Algorithm
  * Computes optimal global sequence alignment and identifies exact mutations
  */
 export function alignSequences(

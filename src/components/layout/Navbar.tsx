@@ -90,7 +90,7 @@ export const Navbar: React.FC = () => {
     {
       id: 'n2',
       title: 'Algorithm Updated',
-      desc: 'Needleman-Wunsch DP alignment scoring engine synced.',
+      desc: 'Pairwise DP alignment scoring engine synced.',
       time: '15m ago',
       type: 'info'
     },

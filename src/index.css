@@ -139,6 +139,47 @@ body {
   animation: pulseGlow 6s ease-in-out infinite;
 }
 
+/* Floating Bioluminescent Particle Ambiance */
+@keyframes floatParticle1 {
+  0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.7; }
+  50% { transform: translateY(-28px) translateX(14px) rotate(180deg); opacity: 1; }
+}
+
+@keyframes floatParticle2 {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.6; }
+  50% { transform: translateY(24px) translateX(-18px) scale(1.25); opacity: 0.95; }
+}
+
+@keyframes floatParticle3 {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.5; }
+  33% { transform: translateY(-18px) translateX(-14px); opacity: 0.85; }
+  66% { transform: translateY(16px) translateX(18px); opacity: 0.7; }
+}
+
+.animate-float-1 {
+  animation: floatParticle1 14s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: floatParticle2 18s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: floatParticle3 16s ease-in-out infinite;
+}
+
+/* Animated High-Tech Laser Scanning Beam for Sequence Viewer */
+@keyframes laserScanner {
+  0% { transform: translateX(-100%); opacity: 0; }
+  15% { opacity: 0.9; }
+  85% { opacity: 0.9; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+.animate-laser-scan {
+  animation: laserScanner 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* ========================================================
    LIGHT & COLOURFUL MODE (Crisp White + Vibrant Scientific Accents)
    ======================================================== */
@@ -425,4 +466,75 @@ html.light select:focus {
 /* Sequence Alignment Character Cells in Light Mode */
 html.light .font-mono-sequence {
   color: #0f172a !important;
+}
+
+/* ========================================================
+   ELECTRIC PURPLE IN WHITE / LIGHT MODE (Icons & Important Words)
+   ======================================================== */
+.electric-purple-text {
+  color: #7c3aed;
+}
+
+.electric-purple-bg {
+  background-color: rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.28);
+  color: #7c3aed;
+}
+
+/* Electric Purple Icon accents in Light Mode */
+html.light .electric-purple-icon,
+html.light aside nav button[class*="text-cyan-300"] > svg,
+html.light aside nav button:hover > svg {
+  color: #7c3aed !important;
+}
+
+/* Sidebar Active Nav in Light Mode */
+html.light aside nav button[class*="text-cyan-300"] {
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.12), rgba(139, 92, 246, 0.04), transparent) !important;
+  border-color: rgba(124, 58, 237, 0.35) !important;
+  color: #6d28d9 !important;
+}
+
+html.light aside nav button[class*="text-cyan-300"] span[class*="bg-cyan-400"] {
+  background-color: #7c3aed !important;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.6) !important;
+}
+
+/* Platform Badges in Electric Purple */
+html.light .bg-cyan-950,
+html.light span.badge-purple {
+  background-color: #f5f3ff !important;
+  border-color: #ddd6fe !important;
+  color: #7c3aed !important;
+}
+
+/* Important words and highlighted headings in Light Mode */
+html.light .highlight-word,
+html.light .text-purple-highlight {
+  color: #7c3aed !important;
+  font-weight: 600;
+}
+
+/* Brand highlight text */
+html.light .brand-accent {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ensure all letters and numbers in tables and stat cards are 100% visible */
+html.light .font-mono {
+  font-weight: 500;
+}
+
+html.light tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important; /* High-contrast readable slate */
+}
+
+html.light .text-slate-500 {
+  color: #64748b !important;
 }

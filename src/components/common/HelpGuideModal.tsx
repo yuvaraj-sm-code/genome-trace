@@ -91,7 +91,7 @@ export const HelpGuideModal: React.FC = () => {
               3. Dynamic Programming Alignment Matrix
             </h3>
             <p className="text-slate-400">
-              Genome Trace employs the Needleman-Wunsch algorithm for global pairwise sequence alignment. By optimizing scoring matrices (Match: +2, Mismatch: -1, Gap: -2), it guarantees optimal alignment of homologous segments and accurate gap placement.
+              Genome Trace employs a dynamic programming matrix algorithm for global pairwise sequence alignment. By optimizing scoring matrices (Match: +2, Mismatch: -1, Gap: -2), it guarantees optimal alignment of homologous segments and accurate gap placement.
             </p>
           </section>
 

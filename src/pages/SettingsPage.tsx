@@ -17,9 +17,12 @@ import {
   Database,
   Flame,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Copy,
+  ExternalLink
 } from 'lucide-react';
 import { useGenome, PRESET_THEMES, CustomThemePalette } from '../context/GenomeContext';
+import { SUPABASE_SQL_SCHEMA } from '../utils/supabase';
 
 export const SettingsPage: React.FC = () => {
   const {
@@ -30,13 +33,23 @@ export const SettingsPage: React.FC = () => {
     setThemeMode,
     addToast,
     clearInputs,
-    loadDemo
+    loadDemo,
+    isSupabaseConnected,
+    supabaseConfig,
+    updateSupabaseCredentials,
+    syncWithSupabase
   } = useGenome();
 
   // Profile state
   const [researcherName, setResearcherName] = useState('Dr. Yuvaraj');
   const [labAffiliation, setLabAffiliation] = useState('Computational Genomics & Epigenetics Laboratory');
   const [emailAddress, setEmailAddress] = useState('yuvaraj@genometrace.bio');
+
+  // Supabase Database state
+  const [supabaseUrlInput, setSupabaseUrlInput] = useState(supabaseConfig.url || '');
+  const [supabaseKeyInput, setSupabaseKeyInput] = useState(supabaseConfig.anonKey || '');
+  const [isConnectingDb, setIsConnectingDb] = useState(false);
+  const [copiedSqlSchema, setCopiedSqlSchema] = useState(false);
 
   // Display preferences
   const [showCodonGrid, setShowCodonGrid] = useState(true);
@@ -439,7 +452,124 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 4: DATA MANAGEMENT & LOGOUT */}
+      {/* SECTION 4: SUPABASE CLOUD DATABASE INTEGRATION */}
+      <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800/80 shadow-md space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div className="flex items-center gap-2.5">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
+              isSupabaseConnected
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                : 'bg-cyan-500/15 border-cyan-500/30 text-cyan-400'
+            }`}>
+              <Database className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-white tracking-wide">
+                  Supabase Cloud Database Persistence
+                </h3>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${
+                  isSupabaseConnected
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : 'bg-slate-800 text-slate-400 border-slate-700'
+                }`}>
+                  {isSupabaseConnected ? 'Connected & Synced' : 'Offline / Local Session'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Connect your managed PostgreSQL instance to persist and query your sequence analysis records permanently.
+              </p>
+            </div>
+          </div>
+
+          {isSupabaseConnected && (
+            <button
+              onClick={() => syncWithSupabase()}
+              className="text-xs text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Sync Now</span>
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label className="text-slate-300 block mb-1 font-medium">Supabase Project URL</label>
+            <input
+              type="text"
+              value={supabaseUrlInput}
+              onChange={(e) => setSupabaseUrlInput(e.target.value)}
+              placeholder="https://xyzcompany.supabase.co"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label className="text-slate-300 block mb-1 font-medium">Anon / Public API Key</label>
+            <input
+              type="password"
+              value={supabaseKeyInput}
+              onChange={(e) => setSupabaseKeyInput(e.target.value)}
+              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(SUPABASE_SQL_SCHEMA);
+                setCopiedSqlSchema(true);
+                addToast('success', 'SQL Copied', 'SQL schema copied to clipboard for your Supabase SQL editor.');
+                setTimeout(() => setCopiedSqlSchema(false), 2500);
+              }}
+              className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer font-medium"
+            >
+              {copiedSqlSchema ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedSqlSchema ? 'Schema Copied!' : 'Copy SQL Table Schema'}</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            {isSupabaseConnected && (
+              <button
+                type="button"
+                onClick={async () => {
+                  await updateSupabaseCredentials('', '');
+                  setSupabaseUrlInput('');
+                  setSupabaseKeyInput('');
+                  addToast('info', 'Supabase Disconnected', 'Switched back to local browser storage.');
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-medium cursor-pointer"
+              >
+                Disconnect
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={isConnectingDb}
+              onClick={async () => {
+                setIsConnectingDb(true);
+                try {
+                  await updateSupabaseCredentials(supabaseUrlInput, supabaseKeyInput);
+                } finally {
+                  setIsConnectingDb(false);
+                }
+              }}
+              className="px-4 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs shadow-md shadow-cyan-600/30 flex items-center gap-1.5 cursor-pointer"
+            >
+              {isConnectingDb && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              <span>Save & Connect Database</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 5: DATA MANAGEMENT & LOGOUT */}
       <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800/80 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
           <h4 className="text-sm font-semibold text-white">Data Management & Cache</h4>

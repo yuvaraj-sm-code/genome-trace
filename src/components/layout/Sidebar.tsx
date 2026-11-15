@@ -183,7 +183,7 @@ export const Sidebar: React.FC = () => {
             </span>
           </div>
           <p className="text-[11px] text-slate-400 leading-relaxed">
-            Needleman-Wunsch DP alignment matrix ready for pairwise comparative genetics.
+            Pairwise DP alignment matrix ready for comparative genetics.
           </p>
         </div>
       )}

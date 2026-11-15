@@ -18,16 +18,26 @@ export const AmbientGlow: React.FC = () => {
       {/* Colorful Light-Mode Gradient Mesh */}
       {isLight && (
         <>
-          {/* Soft Sky Blue Aurora Top */}
+          {/* Electric Purple Ambient Glow Top Right */}
+          <div className="absolute -top-24 right-1/4 w-[550px] h-[450px] rounded-full bg-gradient-to-br from-purple-400/20 via-violet-300/15 to-transparent blur-[120px]" />
+          {/* Soft Sky Blue Aurora Top Left */}
           <div className="absolute -top-32 left-1/4 w-[600px] h-[500px] rounded-full bg-gradient-to-br from-cyan-400/25 via-sky-300/20 to-transparent blur-[120px]" />
           {/* Soft Amber Glow Right */}
           <div className="absolute top-1/4 -right-24 w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-amber-300/25 via-orange-200/20 to-transparent blur-[110px]" />
           {/* Soft Emerald Bio Tint Bottom Left */}
           <div className="absolute bottom-1/4 -left-20 w-[550px] h-[550px] rounded-full bg-gradient-to-tr from-emerald-300/25 via-teal-200/20 to-transparent blur-[120px]" />
-          {/* Soft Indigo / Violet Aura Bottom */}
-          <div className="absolute -bottom-20 right-1/4 w-[600px] h-[500px] rounded-full bg-gradient-to-tl from-indigo-300/20 via-purple-200/15 to-transparent blur-[130px]" />
+          {/* Soft Indigo / Electric Violet Aura Bottom */}
+          <div className="absolute -bottom-20 right-1/4 w-[600px] h-[500px] rounded-full bg-gradient-to-tl from-purple-400/20 via-indigo-300/15 to-transparent blur-[130px]" />
         </>
       )}
+
+      {/* Floating Bioluminescent Particle Nodes */}
+      <div className="absolute top-[18%] left-[12%] w-3 h-3 rounded-full bg-cyan-400/30 blur-[1px] animate-float-1" />
+      <div className="absolute top-[42%] left-[8%] w-4 h-4 rounded-full bg-purple-500/25 blur-[2px] animate-float-2" />
+      <div className="absolute top-[28%] right-[15%] w-2.5 h-2.5 rounded-full bg-amber-400/35 blur-[1px] animate-float-3" />
+      <div className="absolute top-[65%] right-[22%] w-3.5 h-3.5 rounded-full bg-emerald-400/30 blur-[1px] animate-float-1" />
+      <div className="absolute bottom-[20%] left-[25%] w-2 h-2 rounded-full bg-rose-400/30 blur-[1px] animate-float-2" />
+      <div className="absolute top-[80%] right-[12%] w-4 h-4 rounded-full bg-violet-400/25 blur-[2px] animate-float-3" />
 
       {/* Primary Ambient Gradient Orbs Reacting to Mutations */}
       {/* Orb 1: Substitution Reactive (Warm Amber) */}

@@ -73,7 +73,7 @@ const MainLayout: React.FC = () => {
               <span className="italic">Every Mutation Tells a Story.</span>
             </div>
             <div className="flex items-center gap-4 text-[11px] text-slate-500 font-mono">
-              <span>Needleman-Wunsch DP Engine</span>
+              <span>Dynamic Matrix Alignment Engine</span>
               <span>•</span>
               <span>Standard IUPAC Validation</span>
               <span>•</span>

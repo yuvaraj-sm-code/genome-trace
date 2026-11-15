@@ -13,9 +13,11 @@ import {
   Percent,
   X,
   Share2,
-  Printer
+  Printer,
+  Presentation
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
+import pptxgen from 'pptxgenjs';
 import { useGenome } from '../context/GenomeContext';
 import { AnalysisRecord } from '../types/dna';
 
@@ -178,6 +180,147 @@ export const ReportsPage: React.FC = () => {
     }
   };
 
+  // Generate scientific PowerPoint Presentation using pptxgenjs
+  const handleExportPpt = async (record: AnalysisRecord) => {
+    try {
+      const pres = new pptxgen();
+      pres.layout = 'LAYOUT_WIDE'; // 16:9 widescreen presentation
+
+      // Slide 1: Title Slide
+      const slide1 = pres.addSlide();
+      slide1.background = { color: '070C18' };
+
+      slide1.addText('GENOME TRACE', {
+        x: 1.0,
+        y: 1.5,
+        fontSize: 32,
+        bold: true,
+        color: '38BDF8',
+        fontFace: 'Arial'
+      });
+
+      slide1.addText('DNA SEQUENCE ANALYSIS & MUTATION REPORT', {
+        x: 1.0,
+        y: 2.2,
+        fontSize: 14,
+        bold: true,
+        color: '94A3B8',
+        fontFace: 'Arial'
+      });
+
+      slide1.addText(record.title, {
+        x: 1.0,
+        y: 3.2,
+        fontSize: 22,
+        bold: true,
+        color: 'FFFFFF',
+        fontFace: 'Arial'
+      });
+
+      slide1.addText(`Report ID: ${record.id}   |   Date: ${record.timestamp}\nInvestigator: Dr. Yuvaraj — Computational Genomics Lab`, {
+        x: 1.0,
+        y: 4.5,
+        fontSize: 11,
+        color: 'CBD5E1',
+        fontFace: 'Arial'
+      });
+
+      // Slide 2: Executive Summary & Stoichiometry
+      const slide2 = pres.addSlide();
+      slide2.background = { color: '0A1022' };
+
+      slide2.addText('Executive Analysis Summary', {
+        x: 0.8,
+        y: 0.6,
+        fontSize: 20,
+        bold: true,
+        color: '38BDF8'
+      });
+
+      // Metric boxes
+      const metrics = [
+        { title: 'Sequence Length', val: `${record.refStats.length} bp`, color: '0284C7' },
+        { title: 'Sequence Identity', val: `${record.result.identityPercentage}%`, color: '10B981' },
+        { title: 'Total Mutations', val: `${record.result.mutations.length}`, color: 'F59E0B' },
+        { title: 'Reference GC%', val: `${record.refStats.gcContent}%`, color: '6366F1' }
+      ];
+
+      metrics.forEach((m, idx) => {
+        const x = 0.8 + idx * 3.0;
+        slide2.addShape(pres.ShapeType.rect, {
+          x,
+          y: 1.4,
+          w: 2.7,
+          h: 1.5,
+          fill: { color: '131C35' },
+          line: { color: m.color, width: 2 }
+        });
+        slide2.addText(m.title, { x, y: 1.6, w: 2.7, fontSize: 11, color: '94A3B8', align: 'center' });
+        slide2.addText(m.val, { x, y: 2.1, w: 2.7, fontSize: 24, bold: true, color: 'FFFFFF', align: 'center' });
+      });
+
+      slide2.addText(
+        [
+          { text: `Reference Locus: ${record.referenceName}\n`, options: { bold: true, color: 'FFFFFF' } },
+          { text: `Sample Isolate: ${record.sampleName}\n`, options: { bold: true, color: 'FFFFFF' } },
+          { text: `Mutation Profile: ${record.result.substitutions} Substitutions, ${record.result.insertions} Insertions, ${record.result.deletions} Deletions\n`, options: { color: 'CBD5E1' } },
+          { text: `Thermodynamic Estimate (Tm): ${record.refStats.tmEstimated}°C\n`, options: { color: 'CBD5E1' } },
+          { text: `Compliance: Research and educational genomics use only. No clinical diagnoses provided.\n`, options: { italic: true, color: '94A3B8' } }
+        ],
+        { x: 0.8, y: 3.4, w: 11.5, h: 2.8, fontSize: 13 }
+      );
+
+      // Slide 3: Mutation Ledger Table
+      const slide3 = pres.addSlide();
+      slide3.background = { color: '0A1022' };
+
+      slide3.addText('Detected Variations Ledger', {
+        x: 0.8,
+        y: 0.6,
+        fontSize: 20,
+        bold: true,
+        color: '38BDF8'
+      });
+
+      const tableRows: any[] = [
+        [
+          { text: 'Mutation ID', options: { bold: true, fill: { color: '1E293B' }, color: 'FFFFFF' } },
+          { text: 'Position', options: { bold: true, fill: { color: '1E293B' }, color: 'FFFFFF' } },
+          { text: 'Type', options: { bold: true, fill: { color: '1E293B' }, color: 'FFFFFF' } },
+          { text: 'Ref Base', options: { bold: true, fill: { color: '1E293B' }, color: 'FFFFFF' } },
+          { text: 'Sample Base', options: { bold: true, fill: { color: '1E293B' }, color: 'FFFFFF' } },
+          { text: 'Classification', options: { bold: true, fill: { color: '1E293B' }, color: 'FFFFFF' } }
+        ]
+      ];
+
+      record.result.mutations.slice(0, 8).forEach((m) => {
+        tableRows.push([
+          { text: m.id, options: { color: '38BDF8' } },
+          { text: `bp ${m.position}`, options: { color: 'FFFFFF' } },
+          { text: m.type.toUpperCase(), options: { color: m.type === 'substitution' ? 'F59E0B' : m.type === 'insertion' ? '10B981' : 'F43F5E' } },
+          { text: m.refBase, options: { color: 'CBD5E1' } },
+          { text: m.sampleBase, options: { color: '38BDF8' } },
+          { text: m.classification, options: { color: '94A3B8' } }
+        ]);
+      });
+
+      slide3.addTable(tableRows, {
+        x: 0.8,
+        y: 1.4,
+        w: 11.5,
+        fontSize: 11,
+        fill: { color: '131C35' },
+        border: { color: '334155', pt: 1 }
+      });
+
+      await pres.writeFile({ fileName: `GenomeTrace_${record.id}_Presentation.pptx` });
+      addToast('success', 'Presentation Exported', `Generated PPTX presentation for ${record.id}`);
+    } catch (err: any) {
+      console.error('PPT export error:', err);
+      addToast('error', 'PPTX Generation Failed', err?.message || 'Could not export PPTX presentation.');
+    }
+  };
+
   const filteredHistory = history.filter((item) => {
     if (searchFilter) {
       const q = searchFilter.toLowerCase();
@@ -205,19 +348,31 @@ export const ReportsPage: React.FC = () => {
             </span>
           </div>
           <p className="text-sm text-slate-400 mt-1">
-            Search, preview and export verified bioinformatics reports in PDF and CSV format.
+            Search, preview and export verified bioinformatics reports in PDF, PowerPoint (PPTX) and CSV format.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           {selectedReport && (
-            <button
-              onClick={() => handleExportPdf(selectedReport)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium shadow-md shadow-cyan-600/20 transition-all"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download Active Report (PDF)</span>
-            </button>
+            <>
+              <button
+                onClick={() => handleExportPdf(selectedReport)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium shadow-md shadow-cyan-600/20 transition-all cursor-pointer"
+                title="Download verified laboratory report in PDF format"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Report (PDF)</span>
+              </button>
+
+              <button
+                onClick={() => handleExportPpt(selectedReport)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-medium shadow-md shadow-amber-600/20 transition-all cursor-pointer"
+                title="Download scientific presentation deck in PowerPoint (PPTX) format"
+              >
+                <Presentation className="w-3.5 h-3.5" />
+                <span>Download Presentation (PPTX)</span>
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -323,6 +478,13 @@ export const ReportsPage: React.FC = () => {
                         <FileSpreadsheet className="w-3.5 h-3.5" />
                       </button>
                       <button
+                        onClick={() => handleExportPpt(rec)}
+                        title="Download PowerPoint Presentation (PPTX)"
+                        className="p-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-colors"
+                      >
+                        <Presentation className="w-3.5 h-3.5" />
+                      </button>
+                      <button
                         onClick={() => handleExportPdf(rec)}
                         title="Download PDF"
                         className="p-1.5 rounded-lg bg-cyan-600/30 hover:bg-cyan-600 text-cyan-200 hover:text-white border border-cyan-500/40 transition-colors"
@@ -363,14 +525,24 @@ export const ReportsPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleExportCsv(selectedReport)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5 cursor-pointer"
+                  title="Export tabular comma-separated data"
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5" />
                   <span>CSV</span>
                 </button>
                 <button
+                  onClick={() => handleExportPpt(selectedReport)}
+                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-amber-600/25 cursor-pointer"
+                  title="Export slide presentation deck"
+                >
+                  <Presentation className="w-3.5 h-3.5" />
+                  <span>Export PPTX</span>
+                </button>
+                <button
                   onClick={() => handleExportPdf(selectedReport)}
-                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-cyan-600/30"
+                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-cyan-600/30 cursor-pointer"
+                  title="Export publication-ready PDF audit"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Export PDF</span>
